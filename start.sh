@@ -3,6 +3,12 @@
 cd "$(dirname "$0")"
 SCRIPT_DIR="$(pwd)"
 
+# Guard against duplicate server instances
+if [ -f /tmp/mcbedrock.pid ] && kill -0 "$(cat /tmp/mcbedrock.pid)" 2>/dev/null; then
+    echo "Server is already running (PID: $(cat /tmp/mcbedrock.pid)). Aborting."
+    exit 1
+fi
+
 # Set up the command FIFO
 rm -f /tmp/mcbedrock.stdin
 mkfifo /tmp/mcbedrock.stdin
