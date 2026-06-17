@@ -39,7 +39,15 @@ cp .env.example ~/mcbedrock-server/.env
 nano ~/mcbedrock-server/.env
 ```
 
-### 3. Install systemd services
+### 3. Download the playit binary
+
+Download the latest `playit` binary from https://playit.gg, place it at `~/mcbedrock-server/playit`, and make it executable:
+
+```bash
+chmod +x ~/mcbedrock-server/playit
+```
+
+### 4. Install systemd services
 
 ```bash
 sudo bash setup-services.sh
@@ -52,15 +60,7 @@ sudo systemctl start mcbedrock
 sudo systemctl start playit-bedrock
 ```
 
-### 4. Download the playit binary
-
-Download the latest `playit` binary from https://playit.gg, place it at `~/mcbedrock-server/playit`, and make it executable:
-
-```bash
-chmod +x ~/mcbedrock-server/playit
-```
-
-The `playit-bedrock.service` will run it automatically on boot. On first run you may need to authenticate via the playit.gg website — check the output with:
+On first run you may need to authenticate playit via the playit.gg website — check the output with:
 
 ```bash
 sudo journalctl -u playit-bedrock -f
