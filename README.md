@@ -10,8 +10,8 @@ Server lives at: `~/mcbedrock-server/`
 
 | File | Purpose |
 |---|---|
-| `start.sh` | Starts the server, watchdog, and log monitor |
-| `stop.sh` | Gracefully stops the server via the command FIFO |
+| `start-server.sh` | Starts the server, watchdog, and log monitor |
+| `stop-server.sh` | Gracefully stops the server via the command FIFO |
 | `watchdog-server-idle.sh` | Shuts server down after 5min idle; wakes it on client connection |
 | `log-monitor-discord.sh` | Sends Discord notifications on player join/leave |
 | `install-mcaddon.sh` | Installs a `.mcaddon` file into the server's pack directories |
@@ -74,16 +74,16 @@ sudo journalctl -u playit-bedrock -f
 ```bash
 sudo systemctl start mcbedrock   # via systemd (auto-starts on boot)
 # or manually:
-bash ~/mcbedrock-server/start.sh
+bash ~/mcbedrock-server/start-server.sh
 ```
 
-`start.sh` also auto-launches `watchdog.sh` and `log_monitor.sh` in the background if they are present and not already running.
+`start-server.sh` also auto-launches `watchdog.sh` and `log_monitor.sh` in the background if they are present and not already running.
 
 **Stopping the server:**
 ```bash
 sudo systemctl stop mcbedrock
 # or manually:
-bash ~/mcbedrock-server/stop.sh
+bash ~/mcbedrock-server/stop-server.sh
 ```
 
 **Sending commands to the running server:**

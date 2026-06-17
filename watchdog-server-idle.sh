@@ -10,12 +10,12 @@
 # ACTIVE PHASE (server is running):
 #   - Follows /tmp/mcbedrock.log in real-time for "Player connected/disconnected"
 #   - Tracks online count; starts an idle timer when count reaches 0
-#   - After IDLE_TIMEOUT seconds of 0 players, runs stop.sh to shut down BDS
+#   - After IDLE_TIMEOUT seconds of 0 players, runs stop-server.sh to shut down BDS
 #
 # SLEEP PHASE (server is stopped):
 #   - Uses `nc -u -l` to hold UDP port 19132 open and listen for packets
 #   - When a Bedrock client tries to connect, it sends a UDP probe; nc catches
-#     it and exits, which wakes this script and triggers start.sh
+#     it and exits, which wakes this script and triggers start-server.sh
 #   - The client will see a brief "connection failed, retrying" — Bedrock
 #     retries aggressively so it typically connects on the 2nd or 3rd attempt
 #     (~5–10 second delay while the server starts up)
@@ -41,7 +41,7 @@
 # PORT — must match `server-port` in server.properties. Default: 19132.
 #
 # ── CAVEATS ───────────────────────────────────────────────────────────────────
-# - The watchdog is NOT wired into start.sh — run it separately if you want
+# - The watchdog is NOT wired into start-server.sh — run it separately if you want
 #   the sleep behavior. The server runs normally without it.
 # - If the watchdog is stopped while the server is running, the server keeps
 #   running unaffected.
@@ -67,7 +67,7 @@ server_running() {
 start_server() {
     log "Starting Bedrock server..."
     cd "$SERVER_DIR"
-    bash start.sh
+    bash start-server.sh
     for _ in $(seq 1 30); do
         sleep 1
         server_running && break
@@ -78,7 +78,7 @@ start_server() {
 stop_server() {
     log "Idle timeout reached (${IDLE_TIMEOUT}s with 0 players) — stopping server."
     cd "$SERVER_DIR"
-    bash stop.sh || true
+    bash stop-server.sh || true
     log "Server is now sleeping."
 }
 

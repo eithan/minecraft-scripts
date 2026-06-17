@@ -6,7 +6,7 @@ After=network.target
 Type=forking
 User=eithan
 WorkingDirectory=/home/eithan/mcbedrock-server
-ExecStart=/home/eithan/mcbedrock-server/start.sh
+ExecStart=/home/eithan/mcbedrock-server/start-server.sh
 PIDFile=/tmp/mcbedrock.pid
 Restart=on-failure
 
