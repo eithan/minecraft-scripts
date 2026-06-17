@@ -1,0 +1,23 @@
+# Secret credentials - never commit
+.env
+
+# Server runtime files (not needed in repo)
+bedrock_server
+bedrock_server_how_to.html
+Dedicated_Server.txt
+release-notes.txt
+packet-statistics.txt
+playit
+*.zip
+
+# World data and packs (large, back up separately)
+worlds/
+premium_cache/
+minecraftpe/
+treatments/
+definitions/
+
+# Minecraft generated pack directories (installed, not authored)
+behavior_packs/
+resource_packs/
+world_templates/

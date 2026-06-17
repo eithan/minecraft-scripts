@@ -1,0 +1,13 @@
+[Unit]
+Description=Playit.gg Tunnel for Bedrock Server
+After=network.target
+
+[Service]
+Type=simple
+User=eithan
+WorkingDirectory=/home/eithan/mcbedrock-server
+ExecStart=/home/eithan/mcbedrock-server/playit
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
