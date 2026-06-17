@@ -16,6 +16,7 @@ Server lives at: `~/mcbedrock-server/`
 | `log_monitor.sh` | Sends Discord notifications on player join/leave |
 | `install-mcaddon.sh` | Installs a `.mcaddon` file into the server's pack directories |
 | `update-server.sh` | Downloads the latest Bedrock server binary from Mojang and upgrades in-place |
+| `setup-services.sh` | Installs and enables the systemd services (run once on a new machine) |
 
 ---
 
@@ -41,11 +42,12 @@ nano ~/mcbedrock-server/.env
 ### 3. Install systemd services
 
 ```bash
-sudo cp systemd/mcbedrock.service /etc/systemd/system/
-sudo cp systemd/playit-bedrock.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable mcbedrock
-sudo systemctl enable playit-bedrock
+bash setup-services.sh
+```
+
+Then start them:
+
+```bash
 sudo systemctl start mcbedrock
 sudo systemctl start playit-bedrock
 ```
