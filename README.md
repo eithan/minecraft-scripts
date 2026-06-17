@@ -12,8 +12,8 @@ Server lives at: `~/mcbedrock-server/`
 |---|---|
 | `start.sh` | Starts the server, watchdog, and log monitor |
 | `stop.sh` | Gracefully stops the server via the command FIFO |
-| `watchdog.sh` | Shuts server down after 5min idle; wakes it on client connection |
-| `log_monitor.sh` | Sends Discord notifications on player join/leave |
+| `watchdog-server-idle.sh` | Shuts server down after 5min idle; wakes it on client connection |
+| `log-monitor-discord.sh` | Sends Discord notifications on player join/leave |
 | `install-mcaddon.sh` | Installs a `.mcaddon` file into the server's pack directories |
 | `update-server.sh` | Downloads the latest Bedrock server binary from Mojang and upgrades in-place |
 | `setup-services.sh` | Installs and enables the systemd services (run once on a new machine) |

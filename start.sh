@@ -33,13 +33,13 @@ echo "$MC_PID" > /tmp/mcbedrock.pid
 echo "$KEEPALIVE_PID" > /tmp/mcbedrock-keepalive.pid
 
 # Start watchdog if it exists and isn't already running
-if [ -f "$SCRIPT_DIR/watchdog.sh" ] && ! pgrep -f "watchdog.sh" > /dev/null 2>&1; then
-    nohup bash "$SCRIPT_DIR/watchdog.sh" >> /tmp/mcbedrock-watchdog.log 2>&1 &
+if [ -f "$SCRIPT_DIR/watchdog-server-idle.sh" ] && ! pgrep -f "watchdog-server-idle.sh" > /dev/null 2>&1; then
+    nohup bash "$SCRIPT_DIR/watchdog-server-idle.sh" >> /tmp/mcbedrock-watchdog.log 2>&1 &
     echo "Watchdog started (PID: $!)"
 fi
 
 # Start log monitor if it exists and isn't already running
-if [ -f "$SCRIPT_DIR/log_monitor.sh" ] && ! pgrep -f "log_monitor.sh" > /dev/null 2>&1; then
-    nohup bash "$SCRIPT_DIR/log_monitor.sh" >> /tmp/mcbedrock-logmonitor.log 2>&1 &
+if [ -f "$SCRIPT_DIR/log-monitor-discord.sh" ] && ! pgrep -f "log-monitor-discord.sh" > /dev/null 2>&1; then
+    nohup bash "$SCRIPT_DIR/log-monitor-discord.sh" >> /tmp/mcbedrock-logmonitor.log 2>&1 &
     echo "Log monitor started (PID: $!)"
 fi
