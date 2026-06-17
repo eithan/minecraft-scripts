@@ -18,10 +18,10 @@ PRESERVE=(
     development_resource_packs
     development_skin_packs
     config
-    start.sh
-    stop.sh
-    watchdog.sh
-    log_monitor.sh
+    start-server.sh
+    stop-server.sh
+    watchdog-server-idle.sh
+    log-monitor-discord.sh
     install-mcaddon.sh
     playit
 )
@@ -80,7 +80,7 @@ echo ""
 echo "[3/6] Checking if server is running..."
 if [ -f /tmp/mcbedrock.pid ] && kill -0 "$(cat /tmp/mcbedrock.pid)" 2>/dev/null; then
     echo "       Server is running (PID $(cat /tmp/mcbedrock.pid)). Stopping it..."
-    bash stop.sh
+    bash stop-server.sh
     echo "       Server stopped."
 else
     echo "       Server is not running. Continuing."
@@ -129,4 +129,4 @@ chmod +x "$SERVER_DIR/bedrock_server"
 echo ""
 echo "=== Update complete: $NEW_VERSION ==="
 echo "Backup saved to: $BACKUP_DIR"
-echo "Run ./start.sh to start the server."
+echo "Run ./start-server.sh to start the server."

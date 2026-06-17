@@ -2,7 +2,7 @@
 # Move to the script's directory
 cd "$(dirname "$0")"
 
-# File paths (must match start.sh)
+# File paths (must match start-server.sh)
 PID_FILE="/tmp/mcbedrock.pid"
 KEEPALIVE_PID_FILE="/tmp/mcbedrock-keepalive.pid"
 FIFO_FILE="/tmp/mcbedrock.stdin"

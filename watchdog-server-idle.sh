@@ -1,5 +1,5 @@
 #!/bin/bash
-# watchdog.sh — sleep Bedrock server when empty, wake on connection attempt
+# watchdog-server-idle.sh — sleep Bedrock server when empty, wake on connection attempt
 #
 # ── WHY THIS EXISTS ───────────────────────────────────────────────────────────
 # Bedrock Dedicated Server (BDS) has no built-in idle/sleep mode. It runs
@@ -22,10 +22,10 @@
 #
 # ── USAGE ─────────────────────────────────────────────────────────────────────
 # Start the watchdog (runs in background, logs to /tmp/mcbedrock-watchdog.log):
-#   nohup bash ~/mcbedrock-server/watchdog.sh >> /tmp/mcbedrock-watchdog.log 2>&1 &
+#   nohup bash ~/mcbedrock-server/watchdog-server-idle.sh >> /tmp/mcbedrock-watchdog.log 2>&1 &
 #
 # Stop the watchdog (does NOT stop the Minecraft server):
-#   bash ~/mcbedrock-server/watchdog.sh stop
+#   bash ~/mcbedrock-server/watchdog-server-idle.sh stop
 #
 # Watch the watchdog logs:
 #   tail -f /tmp/mcbedrock-watchdog.log
