@@ -42,7 +42,7 @@ nano ~/mcbedrock-server/.env
 ### 3. Install systemd services
 
 ```bash
-bash setup-services.sh
+sudo bash setup-services.sh
 ```
 
 Then start them:
