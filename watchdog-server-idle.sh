@@ -90,7 +90,7 @@ wait_for_client() {
     nc -u -l -p "$PORT" > /dev/null 2>&1 &
     NC_PID=$!
     wait "$NC_PID" || true
-    NC_PID=0
+    NC_PID=""
 }
 
 # ── stop argument ─────────────────────────────────────────────────────────────
@@ -111,7 +111,7 @@ fi
 echo $$ > "$WATCHDOG_PID_FILE"
 log "Watchdog started (PID $$). Idle timeout: ${IDLE_TIMEOUT}s, tick: ${TICK_INTERVAL}s."
 
-NC_PID=0
+NC_PID=""
 
 cleanup() {
     trap - EXIT TERM INT
