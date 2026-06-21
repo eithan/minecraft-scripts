@@ -86,7 +86,11 @@ wait_for_client() {
     # Block until a UDP packet arrives on PORT, then return.
     # The connecting Bedrock client retries aggressively, so missing one packet is fine.
     log "Sleeping. Listening on UDP :${PORT} for a client connection..."
-    nc -u -l -p "$PORT" > /dev/null 2>&1 || true
+    # Run nc in background so SIGTERM to this script can kill it via cleanup().
+    nc -u -l -p "$PORT" > /dev/null 2>&1 &
+    NC_PID=$!
+    wait "$NC_PID" || true
+    NC_PID=0
 }
 
 # ── stop argument ─────────────────────────────────────────────────────────────
@@ -107,8 +111,12 @@ fi
 echo $$ > "$WATCHDOG_PID_FILE"
 log "Watchdog started (PID $$). Idle timeout: ${IDLE_TIMEOUT}s, tick: ${TICK_INTERVAL}s."
 
+NC_PID=0
+
 cleanup() {
+    trap - EXIT TERM INT
     log "Watchdog exiting."
+    kill "$NC_PID"     2>/dev/null || true
     kill "$TICKER_PID" 2>/dev/null || true
     kill "$TAIL_PID"   2>/dev/null || true
     rm -f "$WATCHDOG_PID_FILE"
