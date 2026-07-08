@@ -72,6 +72,18 @@ while IFS= read -r -d '' mcpack; do
   unzip -q "$mcpack" -d "$pack_dir"
 done < <(find "$TMP_DIR" -type f -iname "*.mcpack" -print0)
 
+# Read a JSON file, handling UTF-8 BOM and // line comments (JSONC format)
+read_json() {
+  local f="$1"
+  local first3
+  first3=$(head -c 3 "$f" | od -An -tx1 | tr -d ' \n')
+  if [[ "$first3" == "efbbbf" ]]; then
+    tail -c +4 "$f"
+  else
+    cat "$f"
+  fi | grep -v '^[[:space:]]*//'
+}
+
 # 2 & 3. Find BP and RP via manifest.json
 echo "[INFO] Searching for manifest.json files..."
 
@@ -83,17 +95,43 @@ while IFS= read -r manifest; do
   echo "[DEBUG] Found manifest: $manifest"
 
   # Determine module type
-  if jq -e '.modules[] | select(.type=="data" or .type=="script")' "$manifest" >/dev/null 2>&1; then
+  if read_json "$manifest" | jq -e '.modules[] | select(.type=="data" or .type=="script")' >/dev/null 2>&1; then
     echo "[INFO] Identified Behavior Pack at: $dir"
     BP_SRC="$dir"
   fi
 
-  if jq -e '.modules[] | select(.type=="resources")' "$manifest" >/dev/null 2>&1; then
+  if read_json "$manifest" | jq -e '.modules[] | select(.type=="resources")' >/dev/null 2>&1; then
     echo "[INFO] Identified Resource Pack at: $dir"
     RP_SRC="$dir"
   fi
 
 done < <(find "$TMP_DIR" -type f -name "manifest.json")
+
+# Fallback: if manifest scan missed BP or RP, try matching folder names
+# Matches "BP" or "RP" as a whole token (not buried inside a longer word)
+if [[ -z "$BP_SRC" ]]; then
+  echo "[INFO] Manifest scan did not identify a BP. Falling back to folder name matching..."
+  while IFS= read -r -d '' dir; do
+    name=$(basename "$dir")
+    if [[ "$name" =~ (^|[^A-Za-z])[Bb][Pp]([^A-Za-z]|$) ]]; then
+      echo "[INFO] Found likely BP folder by name: $dir"
+      BP_SRC="$dir"
+      break
+    fi
+  done < <(find "$TMP_DIR" -mindepth 1 -maxdepth 2 -type d -print0)
+fi
+
+if [[ -z "$RP_SRC" ]]; then
+  echo "[INFO] Manifest scan did not identify an RP. Falling back to folder name matching..."
+  while IFS= read -r -d '' dir; do
+    name=$(basename "$dir")
+    if [[ "$name" =~ (^|[^A-Za-z])[Rr][Pp]([^A-Za-z]|$) ]]; then
+      echo "[INFO] Found likely RP folder by name: $dir"
+      RP_SRC="$dir"
+      break
+    fi
+  done < <(find "$TMP_DIR" -mindepth 1 -maxdepth 2 -type d -print0)
+fi
 
 if [[ -z "$BP_SRC" || -z "$RP_SRC" ]]; then
   echo "[ERROR] Could not reliably find BP or RP folders."
@@ -112,15 +150,15 @@ RP_TARGET="$RP_DEST/$RP_NAME"
 # 4. Extract BP manifest info
 echo "[INFO] Reading BP manifest..."
 BP_MANIFEST="$BP_SRC/manifest.json"
-BP_UUID=$(jq -r '.header.uuid' "$BP_MANIFEST")
-BP_VERSION=$(jq '.header.version' "$BP_MANIFEST")
-ADDON_NAME=$(jq -r '.header.name' "$BP_MANIFEST")
+BP_UUID=$(read_json "$BP_MANIFEST" | jq -r '.header.uuid')
+BP_VERSION=$(read_json "$BP_MANIFEST" | jq '.header.version')
+ADDON_NAME=$(read_json "$BP_MANIFEST" | jq -r '.header.name')
 
 # 5. Extract RP manifest info
 echo "[INFO] Reading RP manifest..."
 RP_MANIFEST="$RP_SRC/manifest.json"
-RP_UUID=$(jq -r '.header.uuid' "$RP_MANIFEST")
-RP_VERSION=$(jq '.header.version' "$RP_MANIFEST")
+RP_UUID=$(read_json "$RP_MANIFEST" | jq -r '.header.uuid')
+RP_VERSION=$(read_json "$RP_MANIFEST" | jq '.header.version')
 
 # Move and rename
 echo "[INFO] Installing packs..."
