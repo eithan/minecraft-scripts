@@ -7,6 +7,15 @@ set -euo pipefail
 cd "$(dirname "$0")"
 SERVER_DIR="$(pwd)"
 
+# Refuse to run outside a Bedrock server install (prevents accidental
+# extraction of server files into the wrong directory).
+if [ ! -f "$SERVER_DIR/bedrock_server" ]; then
+    echo "ERROR: No 'bedrock_server' binary found in $SERVER_DIR"
+    echo "       This script must live inside your Bedrock server directory"
+    echo "       (typically ~/mcbedrock-server/). Copy it there and re-run."
+    exit 1
+fi
+
 PRESERVE=(
     worlds
     server.properties
