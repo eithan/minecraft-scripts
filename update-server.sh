@@ -67,12 +67,13 @@ NEW_VERSION=$(echo "$DOWNLOAD_URL" | grep -oP '\d+\.\d+\.\d+\.\d+')
 echo "       Latest version : $NEW_VERSION"
 echo "       Download URL   : $DOWNLOAD_URL"
 
-# 2. Check current version
+# 2. Check current version (written by a previous successful update)
 echo ""
 echo "[2/6] Checking current installed version..."
+VERSION_FILE="$SERVER_DIR/.installed-version"
 CURRENT_VERSION=""
-if [ -f bedrock_server ]; then
-    CURRENT_VERSION=$(strings bedrock_server 2>/dev/null | grep -oP '\d+\.\d+\.\d+\.\d+' | head -1 || true)
+if [ -f "$VERSION_FILE" ]; then
+    CURRENT_VERSION=$(cat "$VERSION_FILE")
 fi
 echo "       Current version: ${CURRENT_VERSION:-unknown}"
 
@@ -136,6 +137,9 @@ for item in "${BACKED_UP[@]}"; do
     echo "       Restored: $item"
 done
 chmod +x "$SERVER_DIR/bedrock_server"
+
+# Record the installed version so the next run can detect "already latest"
+echo "$NEW_VERSION" > "$VERSION_FILE"
 
 echo ""
 echo "=== Server updated to $NEW_VERSION ==="
