@@ -84,15 +84,17 @@ fi
 
 echo "       --> Will update: ${CURRENT_VERSION:-unknown} -> $NEW_VERSION"
 
-# 3. Stop server if running
+# 3. Stop mcbedrock service if active (so we can restart it cleanly after)
 echo ""
-echo "[3/6] Checking if server is running..."
-if [ -f /tmp/mcbedrock.pid ] && kill -0 "$(cat /tmp/mcbedrock.pid)" 2>/dev/null; then
-    echo "       Server is running (PID $(cat /tmp/mcbedrock.pid)). Stopping it..."
-    bash stop-server.sh
-    echo "       Server stopped."
+echo "[3/6] Checking mcbedrock service state..."
+WAS_ACTIVE=false
+if systemctl is-active --quiet mcbedrock; then
+    WAS_ACTIVE=true
+    echo "       Service is active. Stopping mcbedrock..."
+    sudo systemctl stop mcbedrock
+    echo "       Service stopped."
 else
-    echo "       Server is not running. Continuing."
+    echo "       Service is not active. Continuing."
 fi
 
 # 4. Back up preserved items
@@ -136,6 +138,17 @@ done
 chmod +x "$SERVER_DIR/bedrock_server"
 
 echo ""
-echo "=== Update complete: $NEW_VERSION ==="
+echo "=== Server updated to $NEW_VERSION ==="
 echo "Backup saved to: $BACKUP_DIR"
-echo "Run ./start-server.sh to start the server."
+
+# Restart mcbedrock if we stopped it above
+if [ "$WAS_ACTIVE" = true ]; then
+    echo ""
+    echo "Restarting mcbedrock service..."
+    sudo systemctl start mcbedrock
+    echo "Server is restarting."
+    echo "  Service status:  sudo systemctl status mcbedrock"
+    echo "  Live log output: tail -f /tmp/mcbedrock.log"
+else
+    echo "mcbedrock service was not active; leaving it stopped."
+fi
