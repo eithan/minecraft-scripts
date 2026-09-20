@@ -1,0 +1,16 @@
+[Unit]
+Description=Minecraft Bedrock Discord Log Monitor
+After=mcbedrock.service
+BindsTo=mcbedrock.service
+PartOf=mcbedrock.service
+
+[Service]
+Type=simple
+User=eithan
+WorkingDirectory=/home/eithan/mcbedrock-server
+ExecStart=/home/eithan/mcbedrock-server/log-monitor-discord.sh
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=mcbedrock.service

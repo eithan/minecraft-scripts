@@ -3,7 +3,10 @@
 # then starts it back up.
 
 set -euo pipefail
-cd "$(dirname "$0")"
+
+# Always operate on the canonical server directory regardless of where this
+# script (or its symlink) is invoked from.
+cd "$HOME/mcbedrock-server"
 
 if [ ! -x ./update-server.sh ]; then
     echo "ERROR: update-server.sh not found or not executable in $(pwd)"

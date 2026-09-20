@@ -1,6 +1,6 @@
 #!/bin/bash
-# Installs and enables the mcbedrock and playit-bedrock systemd services.
-# Run once after cloning on a new machine. Requires sudo.
+# Installs and enables the mcbedrock, playit-bedrock, and mc-log-monitor
+# systemd services. Run once after cloning on a new machine. Requires sudo.
 
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -8,6 +8,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 echo "Installing systemd service files..."
 sudo cp "$SCRIPT_DIR/systemd/mcbedrock.service" /etc/systemd/system/
 sudo cp "$SCRIPT_DIR/systemd/playit-bedrock.service" /etc/systemd/system/
+sudo cp "$SCRIPT_DIR/systemd/mc-log-monitor.service" /etc/systemd/system/
 
 echo "Reloading systemd..."
 sudo systemctl daemon-reload
@@ -15,6 +16,7 @@ sudo systemctl daemon-reload
 echo "Enabling services (auto-start on boot)..."
 sudo systemctl enable mcbedrock
 sudo systemctl enable playit-bedrock
+sudo systemctl enable mc-log-monitor
 
 echo ""
 echo "Done. Services are enabled but not started."

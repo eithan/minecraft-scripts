@@ -38,8 +38,5 @@ if [ -f "$SCRIPT_DIR/watchdog-server-idle.sh" ] && ! pgrep -f "watchdog-server-i
     echo "Watchdog started (PID: $!)"
 fi
 
-# Start log monitor if it exists and isn't already running
-if [ -f "$SCRIPT_DIR/log-monitor-discord.sh" ] && ! pgrep -f "log-monitor-discord.sh" > /dev/null 2>&1; then
-    nohup bash "$SCRIPT_DIR/log-monitor-discord.sh" >> /tmp/mcbedrock-logmonitor.log 2>&1 &
-    echo "Log monitor started (PID: $!)"
-fi
+# The Discord log monitor is managed by mc-log-monitor.service
+# (WantedBy=mcbedrock.service), so systemd starts and stops it with mcbedrock.

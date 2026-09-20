@@ -4,15 +4,15 @@
 #            behavior/resource packs, config, and custom scripts.
 
 set -euo pipefail
-cd "$(dirname "$0")"
-SERVER_DIR="$(pwd)"
 
-# Refuse to run outside a Bedrock server install (prevents accidental
-# extraction of server files into the wrong directory).
+# Always operate on the canonical server directory regardless of where this
+# script (or its symlink) is invoked from.
+SERVER_DIR="$HOME/mcbedrock-server"
+cd "$SERVER_DIR"
+
 if [ ! -f "$SERVER_DIR/bedrock_server" ]; then
     echo "ERROR: No 'bedrock_server' binary found in $SERVER_DIR"
-    echo "       This script must live inside your Bedrock server directory"
-    echo "       (typically ~/mcbedrock-server/). Copy it there and re-run."
+    echo "       Expected the Bedrock server install to live there."
     exit 1
 fi
 
