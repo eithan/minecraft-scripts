@@ -7,6 +7,8 @@ Type=forking
 User=eithan
 WorkingDirectory=/home/eithan/mcbedrock-server
 ExecStart=/home/eithan/mcbedrock-server/start-server.sh
+ExecStop=/home/eithan/mcbedrock-server/stop-server.sh
+TimeoutStopSec=30
 PIDFile=/tmp/mcbedrock.pid
 Restart=on-failure
 

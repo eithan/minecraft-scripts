@@ -6,7 +6,7 @@ After=network.target
 Type=simple
 User=eithan
 WorkingDirectory=/home/eithan/mcbedrock-server
-ExecStart=/home/eithan/mcbedrock-server/playit
+ExecStart=/home/eithan/mcbedrock-server/playit --stdout start
 Restart=on-failure
 
 [Install]
