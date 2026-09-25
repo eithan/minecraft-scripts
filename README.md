@@ -94,7 +94,7 @@ echo "list" > /tmp/mcbedrock.stdin
 
 **Watching the server log:**
 ```bash
-tail -f /tmp/mcbedrock.log
+tail -f ~/mcbedrock-server/logs/server.log
 ```
 
 **Watchdog behavior:**
@@ -120,7 +120,7 @@ Backs up everything to `~/minecraft-worlds-backup/YYYY-MM-DD_HH-MM-SS/` before u
 | `~/mcbedrock-server/worlds/` | World save data |
 | `~/mcbedrock-server/server.properties` | Server configuration |
 | `~/minecraft-worlds-backup/` | Rolling update backups |
-| `/tmp/mcbedrock.log` | Live server log |
+| `~/mcbedrock-server/logs/server.log` | Live server log |
 | `/tmp/mcbedrock.stdin` | FIFO for sending commands to the server |
 | `/tmp/mcbedrock.pid` | Server process PID |
 | `/tmp/mcbedrock-watchdog.pid` | Watchdog process PID |

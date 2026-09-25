@@ -8,7 +8,7 @@
 #
 # ── HOW IT WORKS ─────────────────────────────────────────────────────────────
 # ACTIVE PHASE (server is running):
-#   - Follows /tmp/mcbedrock.log in real-time for "Player connected/disconnected"
+#   - Follows ~/mcbedrock-server/logs/server.log in real-time for "Player connected/disconnected"
 #   - Tracks online count; starts an idle timer when count reaches 0
 #   - After IDLE_TIMEOUT seconds of 0 players, runs stop-server.sh to shut down BDS
 #
@@ -51,7 +51,7 @@
 #   bind that port while the server is stopped, so this is safe.
 
 SERVER_DIR="$(cd "$(dirname "$0")" && pwd)"
-LOG_FILE="/tmp/mcbedrock.log"
+LOG_FILE="$HOME/mcbedrock-server/logs/server.log"
 PID_FILE="/tmp/mcbedrock.pid"
 WATCHDOG_PID_FILE="/tmp/mcbedrock-watchdog.pid"
 PORT=19132        # Bedrock default UDP port

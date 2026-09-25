@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Config
-LOG_FILE="/tmp/mcbedrock.log"
+LOG_FILE="$HOME/mcbedrock-server/logs/server.log"
 
 # Load .env from server directory if present
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"

@@ -20,10 +20,19 @@ KEEPALIVE_PID=$!
 echo "Started FIFO keepalive (PID: $KEEPALIVE_PID)"
 echo "Send commands with: echo \"say hello\" > /tmp/mcbedrock.stdin"
 
+# Persistent server log (appended across restarts so crash output survives)
+LOG_DIR="$SCRIPT_DIR/logs"
+LOG_FILE="$LOG_DIR/server.log"
+mkdir -p "$LOG_DIR"
+# Rotate once it passes 50MB (keep one old copy)
+if [ -f "$LOG_FILE" ] && [ "$(stat -c %s "$LOG_FILE")" -gt $((50 * 1024 * 1024)) ]; then
+    mv -f "$LOG_FILE" "$LOG_FILE.1"
+fi
+echo "===== start-server.sh: server starting $(date '+%Y-%m-%d %H:%M:%S %Z') =====" >> "$LOG_FILE"
+
 # Start the server
 export LD_LIBRARY_PATH=.
-# Fixed the 2>&1 syntax here
-nohup ./bedrock_server < /tmp/mcbedrock.stdin > /tmp/mcbedrock.log 2>&1 &
+nohup ./bedrock_server < /tmp/mcbedrock.stdin >> "$LOG_FILE" 2>&1 &
 
 MC_PID=$!
 echo "Minecraft Bedrock server PID: $MC_PID"

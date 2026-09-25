@@ -152,7 +152,7 @@ if [ "$WAS_ACTIVE" = true ]; then
     sudo systemctl start mcbedrock
     echo "Server is restarting."
     echo "  Service status:  sudo systemctl status mcbedrock"
-    echo "  Live log output: tail -f /tmp/mcbedrock.log"
+    echo "  Live log output: tail -f ~/mcbedrock-server/logs/server.log"
 else
     echo "mcbedrock service was not active; leaving it stopped."
 fi
