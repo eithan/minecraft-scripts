@@ -83,14 +83,20 @@ stop_server() {
 }
 
 wait_for_client() {
-    # Block until a UDP packet arrives on PORT, then return.
-    # The connecting Bedrock client retries aggressively, so missing one packet is fine.
-    log "Sleeping. Listening on UDP :${PORT} for a client connection..."
+    # Block until a client knocks on PORT, then return. NetherNet clients (BDS 1.26.6x+) open a TCP connection to
+    # PORT first; older RakNet clients send UDP. Listen on both and wake on whichever comes first.
+    # The connecting Bedrock client retries, so missing the first knock is fine.
+    log "Sleeping. Listening on TCP+UDP :${PORT} for a client connection..."
     # Run nc in background so SIGTERM to this script can kill it via cleanup().
     nc -u -l -p "$PORT" > /dev/null 2>&1 &
     NC_PID=$!
-    wait "$NC_PID" || true
-    NC_PID=""
+    nc -l -p "$PORT" < /dev/null > /dev/null 2>&1 &
+    NC_TCP_PID=$!
+    wait -n "$NC_PID" "$NC_TCP_PID" || true
+    kill "$NC_PID" "$NC_TCP_PID" 2>/dev/null || true
+    wait "$NC_PID" "$NC_TCP_PID" 2>/dev/null || true
+    NC_PID=""; NC_TCP_PID=""
+    sleep 1   # let both ports free up before the server binds them
 }
 
 # ── stop argument ─────────────────────────────────────────────────────────────
@@ -112,11 +118,13 @@ echo $$ > "$WATCHDOG_PID_FILE"
 log "Watchdog started (PID $$). Idle timeout: ${IDLE_TIMEOUT}s, tick: ${TICK_INTERVAL}s."
 
 NC_PID=""
+NC_TCP_PID=""
 
 cleanup() {
     trap - EXIT TERM INT
     log "Watchdog exiting."
     kill "$NC_PID"     2>/dev/null || true
+    kill "$NC_TCP_PID" 2>/dev/null || true
     kill "$TICKER_PID" 2>/dev/null || true
     kill "$TAIL_PID"   2>/dev/null || true
     rm -f "$WATCHDOG_PID_FILE"
@@ -135,8 +143,10 @@ while true; do
 
     # ── ACTIVE PHASE ───────────────────────────────────────────────────────────
     ONLINE_COUNT=0
-    IDLE_SINCE=0
-    log "Server is up. Monitoring players..."
+    # Start the idle clock now: a server that comes up (or a watchdog that starts) with nobody on would otherwise
+    # never sleep until someone joins and leaves, e.g. after a wake from a LAN-discovery probe.
+    IDLE_SINCE=$(date +%s)
+    log "Server is up. Monitoring players... (sleeps in ${IDLE_TIMEOUT}s if nobody joins)"
 
     # Background tick generator — writes a sentinel every TICK_INTERVAL seconds
     # so our read loop wakes up even when the log has no new lines.
