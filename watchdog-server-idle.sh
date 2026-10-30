@@ -89,10 +89,18 @@ wait_for_client() {
     # every sleep (10/30) and kept it cycling at 100% CPU through restarts.
     log "Sleeping. Listening on TCP :${PORT} for a client connection..."
     # Run nc in background so SIGTERM to this script can kill it via cleanup().
-    nc -l -p "$PORT" < /dev/null > /dev/null 2>&1 &
-    NC_TCP_PID=$!
-    wait "$NC_TCP_PID" || true
-    NC_TCP_PID=""
+    # Only a real inbound connection wakes the server. If nc can't bind (e.g. "Address already in use" while the
+    # stopped server's socket is still closing; 10/30 this woke the server 2 s after every sleep), retry.
+    while true; do
+        NC_ERR=$(mktemp /tmp/mcbedrock-nc-XXXX)
+        nc -v -l -p "$PORT" < /dev/null > /dev/null 2> "$NC_ERR" &
+        NC_TCP_PID=$!
+        wait "$NC_TCP_PID" || true
+        NC_TCP_PID=""
+        KNOCK=$(tr '\n' ' ' < "$NC_ERR"); rm -f "$NC_ERR"
+        case "$KNOCK" in *[Cc]onnection*received*|*[Cc]onnection*from*) log "Knock: $KNOCK"; break ;; esac
+        sleep 5
+    done
     sleep 1   # let the port free up before the server binds it
 }
 
