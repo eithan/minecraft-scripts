@@ -83,20 +83,17 @@ stop_server() {
 }
 
 wait_for_client() {
-    # Block until a client knocks on PORT, then return. NetherNet clients (BDS 1.26.6x+) open a TCP connection to
-    # PORT first; older RakNet clients send UDP. Listen on both and wake on whichever comes first.
-    # The connecting Bedrock client retries, so missing the first knock is fine.
-    log "Sleeping. Listening on TCP+UDP :${PORT} for a client connection..."
+    # Block until a client opens a TCP connection to PORT, then return. NetherNet clients (BDS 1.26.6x+, the only
+    # transport this server accepts) knock on TCP first. Don't wake on UDP: Minecraft apps sitting on a menu
+    # anywhere on the LAN broadcast UDP discovery pings on 19132 every few seconds, which woke the server right after
+    # every sleep (10/30) and kept it cycling at 100% CPU through restarts.
+    log "Sleeping. Listening on TCP :${PORT} for a client connection..."
     # Run nc in background so SIGTERM to this script can kill it via cleanup().
-    nc -u -l -p "$PORT" > /dev/null 2>&1 &
-    NC_PID=$!
     nc -l -p "$PORT" < /dev/null > /dev/null 2>&1 &
     NC_TCP_PID=$!
-    wait -n "$NC_PID" "$NC_TCP_PID" || true
-    kill "$NC_PID" "$NC_TCP_PID" 2>/dev/null || true
-    wait "$NC_PID" "$NC_TCP_PID" 2>/dev/null || true
-    NC_PID=""; NC_TCP_PID=""
-    sleep 1   # let both ports free up before the server binds them
+    wait "$NC_TCP_PID" || true
+    NC_TCP_PID=""
+    sleep 1   # let the port free up before the server binds it
 }
 
 # ── stop argument ─────────────────────────────────────────────────────────────
