@@ -67,7 +67,9 @@ server_running() {
 start_server() {
     log "Starting Bedrock server..."
     cd "$SERVER_DIR"
-    bash start-server.sh
+    # Go through systemd (mcbedrock.service, Restart=on-failure): stopping/starting behind its back made systemd see
+    # a failure and restart the server right after every sleep (10/30, restart counter 8).
+    sudo -n systemctl start mcbedrock 2>/dev/null || bash start-server.sh
     for _ in $(seq 1 30); do
         sleep 1
         server_running && break
@@ -78,7 +80,13 @@ start_server() {
 stop_server() {
     log "Idle timeout reached (${IDLE_TIMEOUT}s with 0 players) — stopping server."
     cd "$SERVER_DIR"
-    bash stop-server.sh || true
+    # Only when running outside mcbedrock.service's cgroup: `systemctl stop` kills everything in that cgroup, and a
+    # watchdog started by start-server.sh at boot lives there (it would kill itself and nothing would wake the server).
+    if grep -q "mcbedrock.service" /proc/self/cgroup 2>/dev/null; then
+        bash stop-server.sh || true
+    else
+        sudo -n systemctl stop mcbedrock 2>/dev/null || bash stop-server.sh || true
+    fi
     log "Server is now sleeping."
 }
 
